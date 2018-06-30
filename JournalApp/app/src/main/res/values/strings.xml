@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Journal App</string>
+
+    <string name="main_activity_name">Your diaries</string>
+    <string name="add_diary_activity_name">Add a New Diary</string>
+    <string name="detail_diary_activity_name">Details of the Diary</string>
+
+    <string name="diary_string">Diary</string>
+    <string name="edit_diary_title">Title of diary&#8230;</string>
+    <string name="edit_diary_description">Describe your diary here&#8230;</string>
+
+    <string name="add_button">Add</string>
+    <string name="update_button">Update</string>
+
+</resources>
