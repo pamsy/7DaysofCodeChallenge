@@ -12,12 +12,18 @@ import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.android.journalapp.database.AppDatabase;
 import com.example.android.journalapp.database.DiaryEntry;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -35,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements DiaryAdapter.Item
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Toolbar mToolbar = findViewById(R.id.toolbar);
+       // setSupportActionBar(mToolbar);
 
         // Set the RecyclerView to its corresponding view
         mRecyclerView = findViewById(R.id.recyclerViewDiaries);
@@ -127,4 +136,26 @@ public class MainActivity extends AppCompatActivity implements DiaryAdapter.Item
         intent.putExtra(AddDiaryActivity.EXTRA_DIARY_ID, itemId);
         startActivity(intent);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater =  getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.menuLogout:
+                FirebaseAuth.getInstance().signOut();
+                finish();
+                startActivity(new Intent(this, LoginActivity.class));
+        }
+        return true;
+    }
+
 }

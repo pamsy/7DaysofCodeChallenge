@@ -2,17 +2,22 @@ package com.example.android.journalapp;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.android.journalapp.database.AppDatabase;
 import com.example.android.journalapp.database.DiaryEntry;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Date;
 
@@ -56,21 +61,23 @@ public class AddDiaryActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra(EXTRA_DIARY_ID)) {
             mButton.setText(R.string.update_button);
             if (mDiaryId == DEFAULT_DIARY_ID) {
-                // populate the UI
-                // Assign the value of EXTRA_DIARY_ID in the intent to mDiaryId
+
                 // Use DEFAULT_DIARY_ID as the default
                 mDiaryId = intent.getIntExtra(EXTRA_DIARY_ID, DEFAULT_DIARY_ID);
 
-                Log.d(TAG, "Actively retrieving a specific Diary from the DataBase");
+                // LoadTaskById, this is done in the ViewModel now
+                // Declare a AddDiaryViewModelFactory using mDb and mDiaryId
+                AddDiaryViewModelFactory factory = new AddDiaryViewModelFactory(mDb, mDiaryId);
+                // Declare a AddDiaryViewModel variable and initialize it by calling ViewModelProviders.of
+                // for that use the factory created above AddDiaryViewModel
+                final AddDiaryViewModel viewModel
+                        = ViewModelProviders.of(this, factory).get(AddDiaryViewModel.class);
 
-                final LiveData<DiaryEntry> diary = mDb.diaryDao().loadDiaryById(mDiaryId);
-
-                diary.observe(this, new Observer<DiaryEntry>() {
+                // COMPLETED (12) Observe the LiveData object in the ViewModel. Use it also when removing the observer
+                viewModel.getDiary().observe(this, new Observer<DiaryEntry>() {
                     @Override
                     public void onChanged(@Nullable DiaryEntry diaryEntry) {
-
-                        diary.removeObserver(this);
-                        Log.d(TAG, "Receiving database update from LiveData");
+                        viewModel.getDiary().removeObserver(this);
                         populateUI(diaryEntry);
                     }
                 });
@@ -145,6 +152,27 @@ public class AddDiaryActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater =  getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.menuLogout:
+                FirebaseAuth.getInstance().signOut();
+                finish();
+                startActivity(new Intent(this, LoginActivity.class));
+        }
+        return true;
     }
 
 }
