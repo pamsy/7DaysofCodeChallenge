@@ -1,6 +1,9 @@
 package com.example.android.journalapp;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +13,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 
 import com.example.android.journalapp.database.AppDatabase;
@@ -104,18 +108,13 @@ public class MainActivity extends AppCompatActivity implements DiaryAdapter.Item
     }
 
     private void retrieveDiaries() {
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+        Log.d(TAG, "Actively retrieving the Diaries from the DataBase");
+        LiveData<List<DiaryEntry>> diaries = mDb.diaryDao().loadAllDiaries();
+        diaries.observe(this, new Observer<List<DiaryEntry>>() {
             @Override
-            public void run() {
-                final List<DiaryEntry> diaries = mDb.diaryDao().loadAllDiaries();
-                // We will be able to simplify this once we learn more
-                // about Android Architecture Components
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.setDiaries(diaries);
-                    }
-                });
+            public void onChanged(@Nullable List<DiaryEntry> taskEntries) {
+                Log.d(TAG, "Receiving database update from LiveData");
+                mAdapter.setDiaries(taskEntries);
             }
         });
     }

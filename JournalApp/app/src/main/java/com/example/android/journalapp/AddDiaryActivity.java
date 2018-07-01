@@ -1,8 +1,12 @@
 package com.example.android.journalapp;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -56,24 +60,18 @@ public class AddDiaryActivity extends AppCompatActivity {
                 // Assign the value of EXTRA_DIARY_ID in the intent to mDiaryId
                 // Use DEFAULT_DIARY_ID as the default
                 mDiaryId = intent.getIntExtra(EXTRA_DIARY_ID, DEFAULT_DIARY_ID);
-                // Get the diskIO Executor from the instance of AppExecutors and
-                // call the diskIO execute method with a new Runnable and implement its run method
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+
+                Log.d(TAG, "Actively retrieving a specific Diary from the DataBase");
+
+                final LiveData<DiaryEntry> diary = mDb.diaryDao().loadDiaryById(mDiaryId);
+
+                diary.observe(this, new Observer<DiaryEntry>() {
                     @Override
-                    public void run() {
-                        // Use the loadTaskById method to retrieve the diary with id mDiaryId and
-                        // assign its value to a final DiaryEntry variable
-                        final DiaryEntry diary = mDb.diaryDao().loadDiaryById(mDiaryId);
-                        //Call the populateUI method with the retrieve tasks
-                        // Remember to wrap it in a call to runOnUiThread
-                        // We will be able to simplify this once we learn more
-                        // about Android Architecture Components
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                populateUI(diary);
-                            }
-                        });
+                    public void onChanged(@Nullable DiaryEntry diaryEntry) {
+
+                        diary.removeObserver(this);
+                        Log.d(TAG, "Receiving database update from LiveData");
+                        populateUI(diaryEntry);
                     }
                 });
             }
