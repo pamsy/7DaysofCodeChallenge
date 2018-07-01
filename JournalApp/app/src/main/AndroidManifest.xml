@@ -12,19 +12,20 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <!-- The manifest entry for the MainActivity -->
-        <activity android:name="com.example.android.journalapp.MainActivity">
+        <activity android:name=".MainActivity">
+        </activity>
+
+        <!-- AddDiaryActivity -->
+        <activity
+            android:name=".AddDiaryActivity"
+            android:label="@string/add_diary_activity_name" />
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- AddDiaryActivity -->
-        <activity
-            android:name="com.example.android.journalapp.AddDiaryActivity"
-            android:label="@string/add_diary_activity_name" />
-
     </application>
 
 </manifest>
